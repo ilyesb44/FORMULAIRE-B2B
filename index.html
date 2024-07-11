@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Participants</title>
+    <style>
+        .participant {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form id="participantForm">
+        <input type="hidden" id="session" name="session" value="">
+        <div id="participants">
+            <div class="participant">
+                <label for="nom">Nom :</label>
+                <input type="text" name="nom[]" required>
+                <label for="prenom">Prénom :</label>
+                <input type="text" name="prenom[]" required>
+                <label for="email">Email :</label>
+                <input type="email" name="email[]" required>
+            </div>
+        </div>
+        <button type="button" onclick="addParticipant()">Ajouter un participant</button>
+        <button type="submit">Soumettre</button>
+    </form>
+
+    <script>
+        function addParticipant() {
+            const participantsDiv = document.getElementById('participants');
+            const newParticipantDiv = document.createElement('div');
+            newParticipantDiv.classList.add('participant');
+            newParticipantDiv.innerHTML = `
+                <label for="nom">Nom :</label>
+                <input type="text" name="nom[]" required>
+                <label for="prenom">Prénom :</label>
+                <input type="text" name="prenom[]" required>
+                <label for="email">Email :</label>
+                <input type="email" name="email[]" required>
+            `;
+            participantsDiv.appendChild(newParticipantDiv);
+        }
+
+        document.getElementById('participantForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const session = document.getElementById('session').value;
+            const participants = [];
+            const noms = formData.getAll('nom[]');
+            const prenoms = formData.getAll('prenom[]');
+            const emails = formData.getAll('email[]');
+
+            for (let i = 0; i < noms.length; i++) {
+                participants.push({
+                    fields: {
+                        'fldrEILIREtmotmaA': noms[i], // Nom
+                        'fldLAhoY9XlrDiA1D': prenoms[i], // Prénom
+                        'fldvvnCAJn0OcnKzu': emails[i], // Email
+                        'fldjmajfL0JRIY7pc': [session] // Session (Link to Record)
+                    }
+                });
+            }
+
+            const response = await fetch('https://api.airtable.com/v0/tbleKiLSYWhqSDZme/Candidats', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer YOUR_API_KEY',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ records: participants })
+            });
+
+            if (response.ok) {
+                alert('Participants ajoutés avec succès');
+                document.getElementById('participantForm').reset();
+                document.getElementById('participants').innerHTML = `
+                    <div class="participant">
+                        <label for="nom">Nom :</label>
+                        <input type="text" name="nom[]" required>
+                        <label for="prenom">Prénom :</label>
+                        <input type="text" name="prenom[]" required>
+                        <label for="email">Email :</label>
+                        <input type="email" name="email[]" required>
+                    </div>
+                `;
+            } else {
+                alert('Erreur lors de l'ajout des participants');
+            }
+        });
+
+        // Extraire le paramètre de session de l'URL et le définir dans le champ caché
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionParam = urlParams.get('prefill_Session');
+            if (sessionParam) {
+                document.getElementById('session').value = sessionParam;
+            }
+        };
+    </script>
+</body>
+</html>
