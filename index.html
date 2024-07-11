@@ -56,6 +56,8 @@
 
             const formData = new FormData(this);
             const session = document.getElementById('session').value || getSessionFromUrl();
+            console.log('Session ID:', session); // Journal de débogage
+
             const participants = [];
             const noms = formData.getAll('nom[]');
             const prenoms = formData.getAll('prenom[]');
@@ -72,11 +74,13 @@
                 });
             }
 
+            console.log('Participants:', participants); // Journal de débogage
+
             try {
                 const response = await fetch('https://api.airtable.com/v0/tbleKiLSYWhqSDZme/Candidats', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer YOUR_API_KEY',
+                        'Authorization': 'Bearer patxU8J5rq06VHVzD.5159bc1cb85ea7dc86dcf5f9e937667f0efff78f0bece44328a4dcacfccfa07e',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ records: participants })
@@ -97,11 +101,11 @@
                     `;
                 } else {
                     const errorData = await response.json();
-                    console.error('Error:', errorData);
+                    console.error('Error:', errorData); // Journal de débogage
                     alert(`Erreur lors de l'ajout des participants : ${errorData.message}`);
                 }
             } catch (error) {
-                console.error('Fetch error:', error);
+                console.error('Fetch error:', error); // Journal de débogage
                 alert('Erreur lors de l\'ajout des participants');
             }
         });
@@ -109,6 +113,7 @@
         // Définir le paramètre de session dans le champ caché
         window.onload = function() {
             const sessionParam = getSessionFromUrl();
+            console.log('Loaded Session ID:', sessionParam); // Journal de débogage
             if (sessionParam) {
                 document.getElementById('session').value = sessionParam;
             }
