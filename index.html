@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -29,6 +28,7 @@
     </form>
 
     <script>
+        // Fonction pour ajouter un participant
         function addParticipant() {
             const participantsDiv = document.getElementById('participants');
             const newParticipantDiv = document.createElement('div');
@@ -44,11 +44,18 @@
             participantsDiv.appendChild(newParticipantDiv);
         }
 
+        // Fonction pour extraire le paramètre de session de l'URL
+        function getSessionFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('prefill_Session');
+        }
+
+        // Fonction de soumission du formulaire
         document.getElementById('participantForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
             const formData = new FormData(this);
-            const session = document.getElementById('session').value;
+            const session = document.getElementById('session').value || getSessionFromUrl();
             const participants = [];
             const noms = formData.getAll('nom[]');
             const prenoms = formData.getAll('prenom[]');
@@ -88,14 +95,13 @@
                     </div>
                 `;
             } else {
-                alert('Erreur lors de l'ajout des participants');
+                alert('Erreur lors de l\'ajout des participants');
             }
         });
 
-        // Extraire le paramètre de session de l'URL et le définir dans le champ caché
+        // Définir le paramètre de session dans le champ caché
         window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionParam = urlParams.get('prefill_Session');
+            const sessionParam = getSessionFromUrl();
             if (sessionParam) {
                 document.getElementById('session').value = sessionParam;
             }
@@ -103,3 +109,4 @@
     </script>
 </body>
 </html>
+
